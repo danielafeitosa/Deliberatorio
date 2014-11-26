@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20141124021059) do
+ActiveRecord::Schema.define(:version => 20141126165823) do
 
   create_table "deputados", :force => true do |t|
     t.integer  "ide_cadastro"
@@ -43,6 +43,21 @@ ActiveRecord::Schema.define(:version => 20141124021059) do
   end
 
   add_index "deputados", ["partido_id"], :name => "index_deputados_on_partido_id"
+
+  create_table "events", :force => true do |t|
+    t.string   "category"
+    t.text     "description"
+    t.string   "title"
+    t.datetime "created_at",  :null => false
+    t.datetime "updated_at",  :null => false
+  end
+
+  create_table "goals", :force => true do |t|
+    t.text     "description"
+    t.string   "title"
+    t.datetime "created_at",  :null => false
+    t.datetime "updated_at",  :null => false
+  end
 
   create_table "membro_comissaos", :force => true do |t|
     t.integer  "comissao_id"

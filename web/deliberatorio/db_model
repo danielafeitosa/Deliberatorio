@@ -75,3 +75,7 @@ rails generate scaffold periodo_exercicio deputado_id:references sigla_uf_repres
 rails generate scaffold reuniao_pauta orgao_id:references cod_reuniao:integer data:date horario:string local:string estado:string tipo:string titulo_reuniao:string objeto:text
 
 rails generate scaffold proposicao reuniao_id:references sigla:string id_proposicao:integer ementa:text resultado:text 
+
+rails generate scaffold event category:string description:text title:string
+
+rails generate scaffold goal description:text title:string

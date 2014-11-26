@@ -1,4 +1,10 @@
 Deliberatorio::Application.routes.draw do
+  resources :goals
+
+
+  resources :events
+
+
   get "home/index"
 
   resources :proposicaos
