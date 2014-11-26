@@ -27,12 +27,10 @@
 require File.dirname(__FILE__) + '/../config/environment'
 require 'nokogiri'
 require 'open-uri'
-#require_relative 'deputado'
-#require_relative 'orgao'
-#require_relative 'pauta'
 
 # tmp directory
 TMP_PATH = Rails.root.join('data')
+PAUTAS_BY_ORGAO_PATH = TMP_PATH.join('orgaos')
 
 def get_deputados_xml
   'http://www.camara.gov.br/SitCamaraWS/Deputados.asmx/ObterDeputados'
@@ -47,6 +45,17 @@ def get_detalhe_deputado_orgao(ide_cadastro)
   "http://www.camara.gov.br/SitCamaraWS/Deputados.asmx/ObterDetalhesDeputado?ideCadastro=#{ide_cadastro}&numLegislatura="
 end
 
+def get_all_pautas_xml(data_ini = '', data_fim = '')
+  data_ini ||= '20/10/2013'
+  data_fim ||= '31/10/2013'
+
+  Orgao.all.each do |orgao|
+    orgao_id = orgao.id_orgao_legislativo
+    url = get_pauta_xml_from(orgao_id, data_ini, data_fim)
+    system("wget -P #{PAUTAS_BY_ORGAO_PATH} #{url} > #{orgao_id}.xml")
+  end
+end
+
 def get_pauta_xml_from(orgao_id, data_ini = '', data_fim = '')
   data_ini ||= '20/10/2013'
   data_fim ||= '31/10/2013'
@@ -56,8 +65,7 @@ end
 def load_deputados
   deputados_xml = Nokogiri::XML(open(Rails.root.join('data', 'ObterDeputados')))
   deputados_xml.xpath('//deputados/deputado').each do |link|
-#    partido = Partido.where(:sigla =>
-#link.at_xpath('partido').text).first_or_create
+    partido = Partido.where(:sigla => link.at_xpath('partido').text).first_or_create
 
     deputado = Deputado.new(
       :ide_cadastro => link.at_xpath('ideCadastro').text,
@@ -69,7 +77,7 @@ def load_deputados
       :url_foto => link.at_xpath('urlFoto').text,
       :sexo => link.at_xpath('sexo').text,
       :uf => link.at_xpath('uf').text,
-#      :partido => partido,
+      :partido => partido,
       :gabinete => link.at_xpath('gabinete').text,
       :anexo => link.at_xpath('anexo').text,
       :fone => link.at_xpath('fone').text,
@@ -99,13 +107,24 @@ def load_orgaos
   puts
 end
 
+def load_pautas
+  Orgao.all.each do |orgao|
+    file_path = Rails.root.join('data', 'orgaos',
+"#{orgao.id_orgao_legislativo}.xml")
+    orgao_xml = Nokogiri::XML(open(file_path))
+  end
+end
+
 #%w[get_deputados_xml get_orgaos_xml].each do |m|
 #  url = send(m)
 #  system("wget -P #{TMP_PATH} #{url}")
 #end
 
+#get_all_pautas_xml
+
 #load_deputados
 #load_orgaos
+#load_pautas
 
 ####################################################
 #class CamaraService
